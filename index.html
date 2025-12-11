@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOLOv8 Real-Time Object Detection</title>
+
+  <style>
+    /* RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* FULLSCREEN BACKGROUND */
+    body {
+      height: 100vh;
+      width: 100vw;
+      background: url("/static/bg.jpg") center center/cover no-repeat fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* DARK OVERLAY TO ENHANCE READABILITY */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 0;
+    }
+
+    /* MAIN CONTAINER (GLASS CARD STYLE) */
+    .container {
+      z-index: 2;
+      backdrop-filter: blur(20px);
+      background: rgba(20, 20, 20, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 50px rgba(0, 255, 200, 0.2);
+      border-radius: 20px;
+      padding: 50px;
+      width: 90%;
+      max-width: 1000px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #00ffe1, #00b3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
+    }
+
+    p {
+      color: #ccc;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    /* BUTTON GROUP */
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    button,
+    label.upload-btn {
+      background: linear-gradient(90deg, #00ffae, #00b3ff);
+      color: #000;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 32px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 25px rgba(0, 255, 200, 0.3);
+    }
+
+    button:hover,
+    label.upload-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 35px rgba(0, 255, 255, 0.5);
+    }
+
+    label.upload-btn {
+      display: inline-block;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* VIDEO STREAM AREA */
+    .video-container {
+      display: none;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 3px solid #00ffe1;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+      width: 100%;
+      max-width: 900px;
+      height: 500px;
+      margin: 0 auto;
+    }
+
+    #video-stream {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: #aaa;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+
+    footer a {
+      color: #00ffae;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .video-container {
+        height: 300px;
+      }
+      button,
+      label.upload-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container">
+    <h1>YOLOv8 Object Detection WebApp</h1>
+    <p>Choose your mode below — detect objects live or upload files.</p>
+
+    <div class="buttons">
+      <button onclick="startDetection()">🎥 Start Webcam</button>
+      <label for="image-upload" class="upload-btn">🖼 Upload Image</label>
+      <label for="video-upload" class="upload-btn">📹 Upload Video</label>
+      <button onclick="stopDetection()">⏹ Stop Detection</button>
+    </div>
+
+    <input type="file" id="image-upload" accept="image/*" onchange="uploadFile(this, 'image')" />
+    <input type="file" id="video-upload" accept="video/*" onchange="uploadFile(this, 'video')" />
+
+    <div class="video-container" id="video-box">
+      <img id="video-stream" src="" alt="YOLOv5 Video Stream" />
+    </div>
+  </div>
+
+  <footer>
+     <p>Built with ❤️ using <a href="https://yolov8.org/yolov8-pytorch-version/" target="_blank">YOLOv8</a> and Flask</p>
+  </footer>
+
+  <script>
+    function startDetection() {
+      const box = document.getElementById('video-box');
+      const stream = document.getElementById('video-stream');
+      box.style.display = 'block';
+      stream.src = '/video';
+    }
+
+    function stopDetection() {
+      const box = document.getElementById('video-box');
+      const stream = document.getElementById('video-stream');
+      stream.src = '';
+      box.style.display = 'none';
+    }
+
+    function uploadFile(input, type) {
+      const file = input.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch(`/upload_${type}`, {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.text())
+        .then(data => alert(data))
+        .catch(err => alert('Error uploading file.'));
+    }
+  </script>
+</body>
+</html>
