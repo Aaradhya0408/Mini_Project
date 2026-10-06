@@ -1,49 +1,28 @@
-<<<<<<< HEAD
+# Real-Time Object Detection
 
-![Object Detection](https://drive.google.com/uc?export=view&id=15pyink_QV06XZ1ra7MtEqTx1FgkyO0oS)
+Live site: [https://aaradhya0408.github.io/Mini_Project/](https://aaradhya0408.github.io/Mini_Project/)
 
+The page opens a camera, or takes a photo or video, and draws boxes in the browser. That demo uses COCO-SSD so it can run on GitHub Pages without a Python server.
 
-># Real-Time Object Detection with YOLOv5 using Python
+The Python files are the local versions:
 
->### Project Overview:
-In this project, we will implement a real-time object detection system using YOLOv5 (You Only Look Once Version 5). YOLOv5 is a state-of-the-art deep learning model known for its fast and accurate object detection capabilities. We will use pre-trained models to detect common objects in images, videos, or from a live webcam feed.
+- `real_time_object_detection_with_yolov5_using_python.py` loads YOLOv5 and reads the webcam. Press `q` to close it.
+- `app.py` is a Flask app that runs YOLOv8 on a webcam stream or an uploaded file.
+- `Real_Time_Object_Detection_with_YOLOv5_using_Python.ipynb` is the notebook write-up.
 
->## Requirements:
-* Python 3.x
-* Libraries: OpenCV, PyTorch, Matplotlib, Numpy
-* YOLOv5 Model Files (can be downloaded from the official repository)
+## Run the local YOLOv8 app
 
-## Explanation:
->### Setup and Imports:
-* The code begins with importing essential libraries such as torch for using the YOLOv5 model, and opencv-python for image processing and display.
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
->### Load YOLOv5 Model:
-* It loads a pre-trained YOLOv5 model (yolov5s) using PyTorch Hub. YOLOv5s is a smaller, faster version, suitable for real-time detection.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The first run downloads `yolov8s.pt`. Uploaded results are written to `static/uploads/`.
 
->### Object Detection Function:
-* The detect_objects function performs inference on the given image and extracts the detected labels and coordinates.
+`/video` is the YOLOv8 webcam stream. It stays quiet until something requests it, and it shows a message frame when this machine has no camera.
 
->### Bounding Box Plotting:
-* The plot_boxes function draws bounding boxes around detected objects and labels them with the object name.
+## Run the YOLOv5 script
 
->### Real-Time Detection:
-* The real_time_detection function captures the video feed from the webcam and performs object detection on each frame in real-time.
-The frame is displayed with bounding boxes and object labels.
-
->### Running the Code:
-* It runs the real-time object detection loop and exits when 'q' is pressed.
-
->### Advantages of YOLOv5:
-* Speed: Highly optimized for real-time object detection.
-* Accuracy: Capable of detecting multiple objects with high precision.
-* Ease of Use: Pre-trained models are readily available.
-
->## Applications:
-* Security Systems: Real-time monitoring to detect intrusions or unusual activity.
-* Autonomous Vehicles: Detecting objects like pedestrians, vehicles, traffic signs, etc.
-* Retail Analytics: Analyzing customer behavior in stores.
-
->This project is a practical and exciting way to get started with deep learning, computer vision, and real-time applications using Python and YOLOv5.
-=======
-# Real_Time_Object_Detection_System
->>>>>>> 959c9cfeea6c310b08c1b239bec262f6fe35b06b
+```bash
+python real_time_object_detection_with_yolov5_using_python.py
+```

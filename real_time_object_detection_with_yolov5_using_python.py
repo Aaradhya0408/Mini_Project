@@ -112,7 +112,7 @@ def real_time_detection():
     cap.release()
     cv2.destroyAllWindows()
 
-# 6. Running Real-Time Detection
-print("Press 'q' to exit the real-time detection window.")
-real_time_detection()
+if __name__ == "__main__":
+    print("Press 'q' to exit the real-time detection window.")
+    real_time_detection()
 
